@@ -10,7 +10,7 @@ AAuraCharacter::AAuraCharacter()
     // PrimaryActorTick.bCanEverTick = true;
 
     GetCharacterMovement()->bOrientRotationToMovement = true; // Character will rotate to movement direction
-    GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f); // Set rotation rate for character
+    GetCharacterMovement()->RotationRate = FRotator(0.0f, 400.0f, 0.0f); // Set rotation rate for character
     GetCharacterMovement()->bConstrainToPlane = true; // Constrain movement to the plane
     GetCharacterMovement()->bSnapToPlaneAtStart = true; // Snap to the plane at the start
 
