@@ -12,43 +12,57 @@ AAuraPlayerController::AAuraPlayerController()
 
 void AAuraPlayerController::BeginPlay()
 {
-    Super::BeginPlay();
-    check(AuraContext);
-    UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-    check(Subsystem);
-    Subsystem->AddMappingContext(AuraContext, 0); // Add the input mapping context to the local player subsystem
+	Super::BeginPlay();
+	check(AuraContext);
 
-    bShowMouseCursor = true; // Show the mouse cursor for this player controller
-    DefaultMouseCursor = EMouseCursor::Default; // Set the default mouse cursor
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	if (Subsystem)
+	{
+		Subsystem->AddMappingContext(AuraContext, 0);
+	}
 
-    FInputModeGameAndUI InputModeData; // Create an input mode that allows both game and UI interaction
-    InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock); // Do not lock the mouse to the viewport
-    InputModeData.SetHideCursorDuringCapture(false); // Do not hide the cursor during capture
-    SetInputMode(InputModeData); // Apply the input mode to this player controller
+	bShowMouseCursor = true;
+	DefaultMouseCursor = EMouseCursor::Default;
+
+	FInputModeGameAndUI InputModeData;
+	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	InputModeData.SetHideCursorDuringCapture(false);
+	SetInputMode(InputModeData);
 }
 
 void AAuraPlayerController::SetupInputComponent()
 {
-    Super::SetupInputComponent();
+	Super::SetupInputComponent();
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
-
+    
 }
 
-void AAuraPlayerController::Move(const struct FInputActionValue& InputActionValue)
+void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 {
-    const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>(); // Get the input axis vector from the action value
-    const FRotator Rotation = GetControlRotation();
-    const FRotator YawRotation(0.f, Rotation.Yaw, 0.f); // Create a rotation based on the control rotation's yaw
+	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
+	if (InputAxisVector.IsNearlyZero()) return;
 
-    const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X); // Get the forward direction based on the yaw rotation
-    const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y); // Get the right direction based on the yaw rotation
+	const FRotator Rotation = GetControlRotation();
+	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
-    if (APawn* ControlledPawn = GetPawn<APawn>())
-    {
-        ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y); // Add movement input in the forward direction based on the Y axis of the input vector
-        ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
-    }
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+	const FVector MovementDirection = ForwardDirection * InputAxisVector.Y + RightDirection * InputAxisVector.X;
+
+	if (APawn* ControlledPawn = GetPawn<APawn>())
+	{
+		ControlledPawn->AddMovementInput(MovementDirection);
+
+		// 面向移動方向（僅在移動時）
+		if (!MovementDirection.IsNearlyZero())
+		{
+			FRotator TargetRotation = MovementDirection.Rotation();
+			// 可加平滑轉向，但這裡直接設置
+			ControlledPawn->SetActorRotation(TargetRotation);
+		}
+	}
 }
