@@ -19,8 +19,13 @@ public:
 
 	AAuraEnemy();
 	// 必須得從IEnemyInterface繼承過來
+	//  Enemy Interface //
 	virtual void HighlightActor() override; 
 	virtual void UnHighlightActor() override;
+	//  Enemy Interface //
+protected:
+
+	virtual void BeginPlay() override;
 
 };
 
