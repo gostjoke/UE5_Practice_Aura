@@ -12,7 +12,10 @@
 
 UAuraAttributeSet::UAuraAttributeSet()
 {
-	
+	InitHealth(100.0f); // 初始化生命值為 100
+    InitMaxHealth(100.0f); // 初始化最大生命值為 100
+    InitMana(50.0f); // 初始化魔法值為 50
+    InitMaxMana(50.0f); // 初始化最大魔法值為 50
 }
 
 // 3. 網路複製設定函式
@@ -29,7 +32,7 @@ void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
         Health：你想同步的屬性。
         COND_None：沒有條件限制，任何情況都同步。
         REPNOTIFY_OnChanged：每次同步時都會執行 OnRep_Health，不論值有沒有變化。。
-        REPNOTIFY_Always：每次同步都會調用 OnRep_Health 函式。
+        REPNOTIFY_Always：只有在數值變化時才會觸發 OnRep_Health。
     */
 }
 
