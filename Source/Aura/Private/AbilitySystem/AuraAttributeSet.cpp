@@ -12,7 +12,7 @@
 
 UAuraAttributeSet::UAuraAttributeSet()
 {
-	InitHealth(100.0f); // 初始化生命值為 100
+	InitHealth(50.0f); // 初始化生命值為 100
     InitMaxHealth(100.0f); // 初始化最大生命值為 100
     InitMana(50.0f); // 初始化魔法值為 50
     InitMaxMana(50.0f); // 初始化最大魔法值為 50
